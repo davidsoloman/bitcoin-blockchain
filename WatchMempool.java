@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.bitcoinj.tools;
+// package org.bitcoinj.tools;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.base.Joiner;
 
 public class WatchMempool {
     private static Logger log = LoggerFactory.getLogger(WatchMempool.class);
@@ -43,6 +44,7 @@ public class WatchMempool {
     private static final String TOTAL_KEY = "TOTAL";
     private static final long START_MS = System.currentTimeMillis();
     private static final long STATISTICS_FREQUENCY_MS = 1000 * 5;
+    private static String[] msg = new String[2];
 
     public static void main(String[] args) throws InterruptedException {
         BriefLogFormatter.init();
@@ -56,8 +58,13 @@ public class WatchMempool {
                 incrementCounter(TOTAL_KEY);
                 log.info("tx {} result {}", tx.getHash(), result);
                 incrementCounter(result.name());
-                if (result == Result.NON_STANDARD)
+                if (result == Result.NON_STANDARD) {
                     incrementCounter(Result.NON_STANDARD + "-" + DefaultRiskAnalysis.isStandard(tx));
+		} else {
+		    msg[0] = "subj";
+		    msg[1] = Joiner.on("\t").join(tx.getOutputs()); 
+		    new tibrvsend(msg);
+		}
             }
         });
         peerGroup.start();
